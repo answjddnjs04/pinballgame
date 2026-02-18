@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- 상단 에너지 코어 상태 (실시간 팔로워 연동) -->
+        <!-- 상단 에너지 코어 상태 -->
         <div id="energy-core" class="budget-display" style="border-color: var(--neon-blue); background: rgba(0, 210, 255, 0.05); margin-bottom: 20px;">
             <div class="budget-label" style="color: var(--neon-blue);">전투 에너지 코어 동기화 (ball_tournament)</div>
             <div id="core-status" class="budget-val" style="font-size: 24px; color: #fff;">데이터 동기화 중...</div>
@@ -29,7 +29,6 @@
                     <h3 class="config-title">유저 정보</h3>
                     <input type="text" id="name-input" class="config-input" placeholder="활동명 (닉네임)" required>
                     <input type="text" id="insta-input" class="config-input" placeholder="인스타그램 계정 (@ID)" required>
-                    <!-- 팔로워 입력란 삭제됨 -->
                 </div>
 
                 <div class="divider"></div>
@@ -39,10 +38,53 @@
                     
                     <div class="budget-display">
                         <div class="budget-label">사용 가능한 스탯 포인트</div>
-                        <div id="budget-val" class="budget-val">1000</div>
+                        <div id="budget-val" class="budget-val">0</div>
                     </div>
 
                     <div class="stat-grid">
+                        <!-- 쿨타임 (제한 없음) -->
+                        <div class="stat-box">
+                            <label>쿨타임 (COOLDOWN) <small style="display:block; font-size:11px; color:var(--gold);">전체 포인트의 100% 투자 가능</small></label>
+                            <div class="stat-controls">
+                                <button class="stat-btn" onclick="changeStat('cooldown', -10)">-</button>
+                                <span id="cooldown-points" class="val">0</span>
+                                <button class="stat-btn" onclick="changeStat('cooldown', 10)">+</button>
+                            </div>
+                        </div>
+
+                        <!-- 속도 (30% 제한) -->
+                        <div class="stat-box">
+                            <label>속도 (SPEED) <small style="display:block; font-size:11px; color:var(--neon-blue);">전체의 30% 투자 시 최대 속도(30) 도달</small></label>
+                            <div class="stat-controls">
+                                <button class="stat-btn" onclick="changeStat('speed', -10)">-</button>
+                                <span id="speed-display" class="val">5.0</span>
+                                <button class="stat-btn" onclick="changeStat('speed', 10)">+</button>
+                            </div>
+                        </div>
+
+                        <!-- 크기 (30% 제한 + 방향 선택) -->
+                        <div class="stat-box" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                                <label>크기 (SIZE) <small style="display:block; font-size:11px; color:var(--neon-blue);">전체의 30% 투자 시 설정한 극한 크기 도달</small></label>
+                                <div class="stat-controls">
+                                    <button class="stat-btn" onclick="changeStat('size', -10)">-</button>
+                                    <span id="size-display" class="val">30</span>
+                                    <button class="stat-btn" onclick="changeStat('size', 10)">+</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 20px; font-size: 13px; color: #fff; width: 100%; justify-content: flex-end;">
+                                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                    <input type="radio" name="size-dir" value="smaller" checked onchange="updateUI()"> 더 작게 (Min 10)
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                    <input type="radio" name="size-dir" value="larger" onchange="updateUI()"> 더 크게 (Max 100)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- 기본 스탯 (남은 포인트 소진용) -->
                         <div class="stat-box">
                             <label>체력 (HP) <small style="display:block; font-size:10px; opacity:0.6;">1 포인트당 1 상승</small></label>
                             <div class="stat-controls">
@@ -57,22 +99,6 @@
                                 <button class="stat-btn" onclick="changeStat('atk', -1)">-</button>
                                 <span id="atk-val" class="val">5</span>
                                 <button class="stat-btn" onclick="changeStat('atk', 1)">+</button>
-                            </div>
-                        </div>
-                        <div class="stat-box">
-                            <label>속도 (SPD) <small style="display:block; font-size:10px; opacity:0.6;">50 포인트당 1 상승</small></label>
-                            <div class="stat-controls">
-                                <button class="stat-btn" onclick="changeStat('spd', -1)">-</button>
-                                <span id="spd-val" class="val">5</span>
-                                <button class="stat-btn" onclick="changeStat('spd', 1)">+</button>
-                            </div>
-                        </div>
-                        <div class="stat-box">
-                            <label>크기 (SIZE) <small style="display:block; font-size:10px; opacity:0.6;">10 포인트당 1 상승</small></label>
-                            <div class="stat-controls">
-                                <button class="stat-btn" onclick="changeStat('size', -1)">-</button>
-                                <span id="size-val" class="val">25</span>
-                                <button class="stat-btn" onclick="changeStat('size', 1)">+</button>
                             </div>
                         </div>
                     </div>
@@ -94,9 +120,7 @@
 
         <!-- Admin Dashboard Section -->
         <section id="admin-view" style="display: none;">
-            <div id="submissions-list">
-                <!-- Message will be injected here -->
-            </div>
+            <div id="submissions-list"></div>
         </section>
     </div>
 
