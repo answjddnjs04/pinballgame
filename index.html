@@ -46,9 +46,9 @@
                         <div class="stat-box">
                             <label>쿨타임 (COOLDOWN) <small style="display:block; font-size:11px; color:var(--gold);">전체 포인트의 100% 투자 가능</small></label>
                             <div class="stat-controls">
-                                <button class="stat-btn" onclick="changeStat('cooldown', -10)">-</button>
+                                <button class="stat-btn" onclick="changeStat('cooldown', -1)">-</button>
                                 <span id="cooldown-points" class="val">0P</span>
-                                <button class="stat-btn" onclick="changeStat('cooldown', 10)">+</button>
+                                <button class="stat-btn" onclick="changeStat('cooldown', 1)">+</button>
                             </div>
                         </div>
 
@@ -56,9 +56,9 @@
                         <div class="stat-box">
                             <label>속도 (SPEED) <small style="display:block; font-size:11px; color:var(--neon-blue);">전체의 30% 투자 시 최대 속도(30) 도달</small></label>
                             <div class="stat-controls">
-                                <button class="stat-btn" onclick="changeStat('speed', -10)">-</button>
+                                <button class="stat-btn" onclick="changeStat('speed', -1)">-</button>
                                 <span id="speed-display" class="val">5.0</span>
-                                <button class="stat-btn" onclick="changeStat('speed', 10)">+</button>
+                                <button class="stat-btn" onclick="changeStat('speed', 1)">+</button>
                             </div>
                         </div>
 
@@ -67,9 +67,9 @@
                             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                                 <label>크기 (SIZE) <small style="display:block; font-size:11px; color:var(--neon-blue);">전체의 30% 투자 시 설정 크기 도달</small></label>
                                 <div class="stat-controls">
-                                    <button class="stat-btn" onclick="changeStat('size', -10)">-</button>
+                                    <button class="stat-btn" onclick="changeStat('size', -1)">-</button>
                                     <span id="size-display" class="val">30</span>
-                                    <button class="stat-btn" onclick="changeStat('size', 10)">+</button>
+                                    <button class="stat-btn" onclick="changeStat('size', 1)">+</button>
                                 </div>
                             </div>
                             <div style="display: flex; gap: 20px; font-size: 13px; color: #fff; width: 100%; justify-content: flex-end;">
@@ -84,21 +84,21 @@
 
                         <div class="divider"></div>
 
-                        <!-- 기본 스탯 (남은 포인트 소진용) -->
+                        <!-- 기본 스탯 -->
                         <div class="stat-box">
-                            <label>체력 (HP) <small style="display:block; font-size:10px; opacity:0.6;">10 포인트당 10 상승</small></label>
+                            <label>체력 (HP) <small style="display:block; font-size:10px; opacity:0.6;">1 포인트당 1 상승</small></label>
                             <div class="stat-controls">
-                                <button class="stat-btn" onclick="changeStat('hp', -10)">-</button>
+                                <button class="stat-btn" onclick="changeStat('hp', -1)">-</button>
                                 <span id="hp-val" class="val">100</span>
-                                <button class="stat-btn" onclick="changeStat('hp', 10)">+</button>
+                                <button class="stat-btn" onclick="changeStat('hp', 1)">+</button>
                             </div>
                         </div>
                         <div class="stat-box">
-                            <label>공격력 (ATK) <small style="display:block; font-size:10px; opacity:0.6;">10 포인트당 1 상승</small></label>
+                            <label>공격력 (ATK) <small style="display:block; font-size:10px; opacity:0.6;">1 포인트당 0.1 상승</small></label>
                             <div class="stat-controls">
-                                <button class="stat-btn" onclick="changeStat('atk', -10)">-</button>
-                                <span id="atk-val" class="val">10</span>
-                                <button class="stat-btn" onclick="changeStat('atk', 10)">+</button>
+                                <button class="stat-btn" onclick="changeStat('atk', -1)">-</button>
+                                <span id="atk-val" class="val">10.0</span>
+                                <button class="stat-btn" onclick="changeStat('atk', 1)">+</button>
                             </div>
                         </div>
                     </div>

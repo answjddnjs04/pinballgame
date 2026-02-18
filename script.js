@@ -20,13 +20,10 @@ let remainingPoints = 0;
 async function syncFollowerData() {
     const coreStatus = document.getElementById('core-status');
     try {
-        console.log("Fetching follower data...");
         const response = await fetch('/api/followers');
         const data = await response.json();
         
-        console.log("API Response:", data);
-        
-        // 팔로워 수 1명당 10포인트로 조정
+        // 1팔로워당 10포인트
         followerCount = data.followers || 0;
         totalBudget = followerCount * 10; 
         
@@ -35,7 +32,6 @@ async function syncFollowerData() {
         
         initBudget();
     } catch (err) {
-        console.error("동기화 실패:", err);
         coreStatus.innerText = "● OFFLINE: 데이터 동기화 실패";
         coreStatus.style.color = "#ff4757";
         totalBudget = 0;
@@ -45,19 +41,18 @@ async function syncFollowerData() {
 
 // 2. Budget 관리
 function initBudget() {
-    // 사용한 포인트 합계 (points 객체의 값들을 모두 더함)
     const spent = Object.values(points).reduce((a, b) => a + b, 0);
     remainingPoints = totalBudget - spent;
     updateUI();
 }
 
 function changeStat(statName, delta) {
-    // 30% Limit for Speed and Size (if totalBudget > 100)
-    // 포인트가 너무 적을 때는 제한을 풀어줌
-    if (totalBudget >= 100 && (statName === 'speed' || statName === 'size')) {
+    // 30% Limit for Speed and Size
+    // 팔로워가 있어 에너지가 생성되었을 때만 제한 적용
+    if (totalBudget > 0 && (statName === 'speed' || statName === 'size')) {
         const limit = totalBudget * 0.3;
-        if (delta > 0 && points[statName] + delta > limit) {
-            alert(`전체 에너지의 30% (${Math.floor(limit)}P) 한도에 도달했습니다.`);
+        if (delta > 0 && (points[statName] + delta) > limit) {
+            alert(`해당 능력치는 전체 에너지의 30% (${limit.toFixed(1)}P)까지만 투자할 수 있습니다!`);
             return;
         }
     }
@@ -68,7 +63,7 @@ function changeStat(statName, delta) {
         return;
     }
 
-    // Min Check (투자한 포인트가 0 미만이 될 수 없음)
+    // Min Check (투자 포인트는 0 미만 불가)
     if (delta < 0 && points[statName] + delta < 0) {
         return;
     }
@@ -80,31 +75,34 @@ function changeStat(statName, delta) {
 function updateUI() {
     // 1. Speed Calculation (0% -> 5, 30% -> 30)
     let speedVal = BASE_STATS.speed;
-    const speedLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
-    const speedRatio = points.speed / speedLimit;
-    speedVal = BASE_STATS.speed + (speedRatio * (MAX_STATS.speed - BASE_STATS.speed));
+    if (totalBudget > 0) {
+        const speedLimit = totalBudget * 0.3;
+        const speedRatio = points.speed / (speedLimit || 1);
+        speedVal = BASE_STATS.speed + (speedRatio * (MAX_STATS.speed - BASE_STATS.speed));
+    }
     document.getElementById('speed-display').innerText = Math.min(30, speedVal.toFixed(1));
 
     // 2. Size Calculation (0% -> 30, 30% -> 10 or 100)
     let sizeVal = BASE_STATS.size;
     const sizeDir = document.querySelector('input[name="size-dir"]:checked').value;
-    const sizeLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
-    const sizeRatio = points.size / sizeLimit;
-    
-    if (sizeDir === 'smaller') {
-        sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
-    } else {
-        sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
+    if (totalBudget > 0) {
+        const sizeLimit = totalBudget * 0.3;
+        const sizeRatio = points.size / (sizeLimit || 1);
+        if (sizeDir === 'smaller') {
+            sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
+        } else {
+            sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
+        }
     }
     document.getElementById('size-display').innerText = Math.round(sizeVal);
 
     // 3. HP/ATK Basic
-    // HP: 10포인트당 10 상승 (1:1)
+    // HP: 1포인트당 1 HP
     document.getElementById('hp-val').innerText = BASE_STATS.hp + points.hp;
-    // ATK: 10포인트당 1 상승
-    document.getElementById('atk-val').innerText = BASE_STATS.atk + Math.floor(points.atk / 10);
+    // ATK: 1포인트당 0.1 ATK
+    document.getElementById('atk-val').innerText = (BASE_STATS.atk + (points.atk * 0.1)).toFixed(1);
 
-    // 4. Cooldown
+    // 4. Cooldown (Show points)
     document.getElementById('cooldown-points').innerText = points.cooldown + "P";
 
     // 5. Budget Display
@@ -113,7 +111,7 @@ function updateUI() {
     budgetEl.style.color = remainingPoints < 0 ? "#ff4757" : "#fff";
 }
 
-// 3. View Management
+// 3. View Management (동일)
 function setView(mode) {
     const submitView = document.getElementById('submit-view');
     const adminView = document.getElementById('admin-view');
@@ -134,7 +132,7 @@ function setView(mode) {
     }
 }
 
-// 4. Form Submission
+// 4. Form Submission (최종 계산 반영)
 async function submitForm() {
     const name = document.getElementById('name-input').value;
     const instaId = document.getElementById('insta-input').value;
@@ -142,20 +140,21 @@ async function submitForm() {
     const sizeDir = document.querySelector('input[name="size-dir"]:checked').value;
     
     if (!name || !instaId) {
-        alert("활동명과 인스타 계정을 입력해 주세요.");
+        alert("이름과 인스타 계정을 입력해 주세요.");
         return;
     }
 
-    // 최종 데이터 계산
-    const speedLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
-    const speedVal = (BASE_STATS.speed + ((points.speed / speedLimit) * (MAX_STATS.speed - BASE_STATS.speed))).toFixed(2);
+    // 최종 수치 계산
+    const speedLimit = totalBudget * 0.3;
+    const speedVal = (BASE_STATS.speed + ((points.speed / (speedLimit || 1)) * (MAX_STATS.speed - BASE_STATS.speed))).toFixed(2);
     
-    const sizeLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
+    const sizeLimit = totalBudget * 0.3;
     let sizeVal = BASE_STATS.size;
+    const sizeRatio = points.size / (sizeLimit || 1);
     if (sizeDir === 'smaller') {
-        sizeVal = BASE_STATS.size - ((points.size / sizeLimit) * (BASE_STATS.size - MAX_STATS.size_smaller));
+        sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
     } else {
-        sizeVal = BASE_STATS.size + ((points.size / sizeLimit) * (MAX_STATS.size_larger - BASE_STATS.size));
+        sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
     }
 
     const formData = new FormData();
@@ -163,7 +162,7 @@ async function submitForm() {
     formData.append("인스타그램ID", instaId);
     formData.append("대회계정_팔로워수", followerCount);
     formData.append("최종_HP", BASE_STATS.hp + points.hp);
-    formData.append("최종_ATK", BASE_STATS.atk + Math.floor(points.atk / 10));
+    formData.append("최종_ATK", (BASE_STATS.atk + (points.atk * 0.1)).toFixed(1));
     formData.append("최종_SPEED", speedVal);
     formData.append("최종_SIZE", Math.round(sizeVal));
     formData.append("SIZE_방향", sizeDir);
@@ -193,7 +192,7 @@ function renderAdminMessage() {
     list.innerHTML = `
         <div class="card" style="text-align: center; border-left-color: var(--gold);">
             <div class="panel-label">COMMAND CENTER</div>
-            <p class="skill-text">모든 데이터는 Formspree에서 확인하세요.</p>
+            <p class="skill-text">제출된 모든 데이터는 Formspree에서 확인하세요.</p>
             <br>
             <button onclick="window.open('https://formspree.io/forms/mwvnqprn/submissions', '_blank')">데이터 확인하기</button>
         </div>
