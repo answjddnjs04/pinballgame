@@ -8,11 +8,11 @@ let points = {
 };
 
 // Base Values
-const BASE_STATS = { hp: 100, atk: 5, speed: 5, size: 30 };
-const MIN_STATS = { hp: 100, atk: 5, speed: 0, size: 10 };
+const BASE_STATS = { hp: 100, atk: 10, speed: 5, size: 30 };
+const MIN_STATS = { hp: 100, atk: 10, speed: 0, size: 10 };
 const MAX_STATS = { speed: 30, size_larger: 100, size_smaller: 10 };
 
-let followerBonus = 0;
+let followerCount = 0;
 let totalBudget = 0;
 let remainingPoints = 0;
 
@@ -20,16 +20,22 @@ let remainingPoints = 0;
 async function syncFollowerData() {
     const coreStatus = document.getElementById('core-status');
     try {
+        console.log("Fetching follower data...");
         const response = await fetch('/api/followers');
         const data = await response.json();
-        followerBonus = data.followers || 0; 
         
-        coreStatus.innerText = `● SYNCED: ${followerBonus.toLocaleString()} 에너지 충전됨 (@ball_tournament)`;
+        console.log("API Response:", data);
+        
+        // 팔로워 수 1명당 10포인트로 조정
+        followerCount = data.followers || 0;
+        totalBudget = followerCount * 10; 
+        
+        coreStatus.innerText = `● SYNCED: ${followerCount.toLocaleString()} 에너지 충전됨 (@ball_tournament)`;
         coreStatus.style.color = "var(--neon-blue)";
         
-        totalBudget = followerBonus;
         initBudget();
     } catch (err) {
+        console.error("동기화 실패:", err);
         coreStatus.innerText = "● OFFLINE: 데이터 동기화 실패";
         coreStatus.style.color = "#ff4757";
         totalBudget = 0;
@@ -39,17 +45,19 @@ async function syncFollowerData() {
 
 // 2. Budget 관리
 function initBudget() {
+    // 사용한 포인트 합계 (points 객체의 값들을 모두 더함)
     const spent = Object.values(points).reduce((a, b) => a + b, 0);
     remainingPoints = totalBudget - spent;
     updateUI();
 }
 
 function changeStat(statName, delta) {
-    // 30% Limit for Speed and Size (if totalBudget > 0)
-    if (totalBudget > 0 && (statName === 'speed' || statName === 'size')) {
+    // 30% Limit for Speed and Size (if totalBudget > 100)
+    // 포인트가 너무 적을 때는 제한을 풀어줌
+    if (totalBudget >= 100 && (statName === 'speed' || statName === 'size')) {
         const limit = totalBudget * 0.3;
         if (delta > 0 && points[statName] + delta > limit) {
-            alert(`해당 능력치는 전체 에너지의 30% (${Math.floor(limit).toLocaleString()}P)까지만 투자할 수 있습니다.`);
+            alert(`전체 에너지의 30% (${Math.floor(limit)}P) 한도에 도달했습니다.`);
             return;
         }
     }
@@ -60,7 +68,7 @@ function changeStat(statName, delta) {
         return;
     }
 
-    // Min Check
+    // Min Check (투자한 포인트가 0 미만이 될 수 없음)
     if (delta < 0 && points[statName] + delta < 0) {
         return;
     }
@@ -72,31 +80,32 @@ function changeStat(statName, delta) {
 function updateUI() {
     // 1. Speed Calculation (0% -> 5, 30% -> 30)
     let speedVal = BASE_STATS.speed;
-    if (totalBudget > 0) {
-        const speedRatio = points.speed / (totalBudget * 0.3);
-        speedVal = BASE_STATS.speed + (speedRatio * (MAX_STATS.speed - BASE_STATS.speed));
-    }
+    const speedLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
+    const speedRatio = points.speed / speedLimit;
+    speedVal = BASE_STATS.speed + (speedRatio * (MAX_STATS.speed - BASE_STATS.speed));
     document.getElementById('speed-display').innerText = Math.min(30, speedVal.toFixed(1));
 
     // 2. Size Calculation (0% -> 30, 30% -> 10 or 100)
     let sizeVal = BASE_STATS.size;
     const sizeDir = document.querySelector('input[name="size-dir"]:checked').value;
-    if (totalBudget > 0) {
-        const sizeRatio = points.size / (totalBudget * 0.3);
-        if (sizeDir === 'smaller') {
-            sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
-        } else {
-            sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
-        }
+    const sizeLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
+    const sizeRatio = points.size / sizeLimit;
+    
+    if (sizeDir === 'smaller') {
+        sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
+    } else {
+        sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
     }
     document.getElementById('size-display').innerText = Math.round(sizeVal);
 
     // 3. HP/ATK Basic
+    // HP: 10포인트당 10 상승 (1:1)
     document.getElementById('hp-val').innerText = BASE_STATS.hp + points.hp;
-    document.getElementById('atk-val').innerText = BASE_STATS.atk + Math.floor(points.atk / 20);
+    // ATK: 10포인트당 1 상승
+    document.getElementById('atk-val').innerText = BASE_STATS.atk + Math.floor(points.atk / 10);
 
-    // 4. Cooldown (Show points)
-    document.getElementById('cooldown-points').innerText = points.cooldown.toLocaleString() + "P";
+    // 4. Cooldown
+    document.getElementById('cooldown-points').innerText = points.cooldown + "P";
 
     // 5. Budget Display
     const budgetEl = document.getElementById('budget-val');
@@ -137,24 +146,24 @@ async function submitForm() {
         return;
     }
 
-    // Final calculations for storage
-    const speedRatio = totalBudget > 0 ? points.speed / (totalBudget * 0.3) : 0;
-    const speedVal = (BASE_STATS.speed + (speedRatio * (MAX_STATS.speed - BASE_STATS.speed))).toFixed(2);
+    // 최종 데이터 계산
+    const speedLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
+    const speedVal = (BASE_STATS.speed + ((points.speed / speedLimit) * (MAX_STATS.speed - BASE_STATS.speed))).toFixed(2);
     
-    const sizeRatio = totalBudget > 0 ? points.size / (totalBudget * 0.3) : 0;
+    const sizeLimit = totalBudget >= 100 ? (totalBudget * 0.3) : 100;
     let sizeVal = BASE_STATS.size;
     if (sizeDir === 'smaller') {
-        sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
+        sizeVal = BASE_STATS.size - ((points.size / sizeLimit) * (BASE_STATS.size - MAX_STATS.size_smaller));
     } else {
-        sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
+        sizeVal = BASE_STATS.size + ((points.size / sizeLimit) * (MAX_STATS.size_larger - BASE_STATS.size));
     }
 
     const formData = new FormData();
     formData.append("활동명", name);
     formData.append("인스타그램ID", instaId);
-    formData.append("대회계정_팔로워수", followerBonus);
+    formData.append("대회계정_팔로워수", followerCount);
     formData.append("최종_HP", BASE_STATS.hp + points.hp);
-    formData.append("최종_ATK", BASE_STATS.atk + Math.floor(points.atk / 20));
+    formData.append("최종_ATK", BASE_STATS.atk + Math.floor(points.atk / 10));
     formData.append("최종_SPEED", speedVal);
     formData.append("최종_SIZE", Math.round(sizeVal));
     formData.append("SIZE_방향", sizeDir);
