@@ -3,51 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>팔로워 배틀 스탯 등록</title>
+    <title>STARSHIP HANGAR 07 - PILOT REGISTRATION</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <div class="view-toggle">
-            <button id="submit-mode-btn" class="active" onclick="setView('submit')">스탯 등록하기</button>
-            <button id="admin-mode-btn" onclick="setView('admin')">관리자 보기</button>
+            <button id="submit-mode-btn" class="active" onclick="setView('submit')">UNIT REGISTRATION</button>
+            <button id="admin-mode-btn" onclick="setView('admin')">COMMAND CENTER</button>
         </div>
 
         <!-- Submission Form Section -->
         <section id="submit-view">
             <div id="settings-panel">
-                <div class="panel-label">캐릭터 등록 시스템</div>
+                <div class="panel-label">STARSHIP PILOT REGISTRATION</div>
+                
                 <div class="config-group">
-                    <h3 class="config-title">유저 정보</h3>
-                    <input type="text" id="name-input" class="config-input" placeholder="활동명 (닉네임)" required>
-                    <input type="text" id="insta-input" class="config-input" placeholder="인스타그램 계정 (@ID)" required>
-                    <input type="number" id="follower-input" class="config-input" placeholder="팔로워 수" required oninput="calculateStats()">
+                    <h3 class="config-title">파일럿 식별 (PILOT IDENTIFICATION)</h3>
+                    <input type="text" id="name-input" class="config-input" placeholder="호출 부호 (활동명)" required>
+                    <input type="text" id="insta-input" class="config-input" placeholder="통신망 주소 (인스타 @ID)" required>
+                    <input type="number" id="follower-input" class="config-input" placeholder="지원 부대 규모 (팔로워 수)" required oninput="calculateStats()">
                 </div>
 
                 <div class="divider"></div>
 
                 <div class="config-group">
-                    <h3 class="config-title">계산된 능력치</h3>
+                    <h3 class="config-title">기체 제원 (UNIT SPECIFICATIONS)</h3>
                     <div class="stat-grid">
-                        <div class="stat-box"><label>체력(HP)</label><span id="hp-val" class="val">100</span></div>
-                        <div class="stat-box"><label>공격력(ATK)</label><span id="atk-val" class="val">5</span></div>
-                        <div class="stat-box"><label>속도(SPD)</label><span id="spd-val" class="val">5</span></div>
-                        <div class="stat-box"><label>크기(SIZE)</label><span id="size-val" class="val">25</span></div>
+                        <div class="stat-box"><label>선체 내구도 (HP)</label><span id="hp-val" class="val">100</span></div>
+                        <div class="stat-box"><label>화력 출력 (ATK)</label><span id="atk-val" class="val">5</span></div>
+                        <div class="stat-box"><label>추진 속도 (SPD)</label><span id="spd-val" class="val">5</span></div>
+                        <div class="stat-box"><label>선체 크기 (SIZE)</label><span id="size-val" class="val">25</span></div>
                     </div>
                 </div>
 
                 <div class="divider"></div>
 
                 <div class="config-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h3 class="config-title" style="margin-bottom: 0;">스킬 설명</h3>
-                        <span style="font-size: 9px; color: var(--gold); opacity: 0.8;">(상상하신 스킬(딜 구조)을 정확하게 묘사해주세요!)</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                        <h3 class="config-title" style="margin-bottom: 0;">전술 모듈 (TACTICAL MODULE)</h3>
+                        <span style="font-size: 13px; color: var(--gold); opacity: 0.9; font-weight: 700; letter-spacing: 0.5px;">(상상하신 스킬 및 딜 구조를 정확하게 묘사해주세요!)</span>
                     </div>
-                    <textarea id="skill-desc" class="config-textarea" placeholder="당신만의 고유한 배틀 스킬을 설명해 주세요..."></textarea>
+                    <textarea id="skill-desc" class="config-textarea" placeholder="당신만의 고유한 전술 스킬 또는 기체 특수 기능을 상세히 기록하세요..."></textarea>
                 </div>
 
-                <button onclick="submitForm()">캐릭터 등록하기</button>
+                <button onclick="submitForm()">기체 출격 승인 (DEPLOY UNIT)</button>
             </div>
         </section>
 

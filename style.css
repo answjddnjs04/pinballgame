@@ -1,15 +1,21 @@
 :root {
     --p1-color: #ff4757;
-    --p2-color: #00d2ff;
+    --neon-blue: #00d2ff;
     --gold: #ffd700;
-    --bg-dark: #0a0b10;
+    --bg-dark: #050608;
+    --panel-border: rgba(255, 215, 0, 0.3);
+}
+
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
 }
 
 * { box-sizing: border-box; }
 
 body {
     background-color: var(--bg-dark);
-    color: white;
+    color: #e0e0e0;
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 20px;
@@ -17,126 +23,146 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+    background: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        radial-gradient(circle at center, #1b2735 0%, #050608 100%);
+    background-size: 100% 4px, 100% 100%;
+    overflow-x: hidden;
+}
+
+/* 스캔라인 효과 */
+body::before {
+    content: " ";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(18, 16, 16, 0) 100%);
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .container {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     z-index: 1;
 }
 
-#side-controls, #settings-panel, .card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    padding: 25px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+#settings-panel, .card {
+    background: rgba(10, 15, 25, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 35px;
+    border: 2px solid var(--panel-border);
+    border-radius: 4px; /* 각진 느낌 */
+    margin-bottom: 40px;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(0, 210, 255, 0.1), 0 10px 40px rgba(0,0,0,0.8);
+}
+
+/* 산업용 패널 모서리 장식 */
+#settings-panel::after {
+    content: "WARSHIP MAINTENANCE UNIT - 07";
+    position: absolute;
+    bottom: -12px; right: 20px;
+    font-size: 10px; font-weight: 900; color: var(--gold);
+    background: var(--bg-dark); padding: 0 10px;
 }
 
 .panel-label { 
-    font-size: 12px; 
+    font-size: 20px; 
     font-weight: 900; 
     color: var(--gold); 
-    text-align: center; 
-    letter-spacing: 3px; 
-    margin-bottom: 25px; 
+    text-align: left; 
+    letter-spacing: 5px; 
+    margin-bottom: 35px; 
     text-transform: uppercase;
+    border-bottom: 3px solid var(--gold);
+    padding-bottom: 10px;
+    display: inline-block;
 }
 
-.config-group { margin-bottom: 20px; }
-.config-title { font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-transform: uppercase; }
+.config-group { margin-bottom: 30px; }
+.config-title { 
+    font-size: 14px; 
+    font-weight: 900; 
+    color: var(--neon-blue); 
+    margin-bottom: 15px; 
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+}
+.config-title::before {
+    content: "▶"; margin-right: 8px; font-size: 10px;
+}
 
 .config-input { 
     width: 100%; 
-    background: rgba(0,0,0,0.4); 
-    border: 1px solid rgba(255,255,255,0.1); 
-    border-radius: 8px; 
-    padding: 12px; 
+    background: rgba(0,0,0,0.6); 
+    border: 1px solid rgba(0, 210, 255, 0.3); 
+    border-radius: 0; 
+    padding: 16px; 
     color: #fff; 
     font-weight: 700; 
-    margin-bottom: 12px; 
-    font-size: 14px;
+    margin-bottom: 15px; 
+    font-size: 18px; /* 크게 */
     outline: none;
-    transition: border-color 0.3s;
+    font-family: 'Montserrat', sans-serif;
 }
-.config-input:focus { border-color: var(--gold); }
+.config-input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
 
 .stat-grid { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 
-    gap: 10px; 
-    margin-bottom: 15px; 
+    gap: 15px; 
 }
 
 .stat-box { 
-    background: rgba(0,0,0,0.2); 
-    padding: 10px; 
-    border-radius: 8px; 
+    background: rgba(255, 255, 255, 0.03); 
+    padding: 15px; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex; 
     justify-content: space-between; 
     align-items: center;
 }
-.stat-box label { font-size: 10px; font-weight: 900; opacity: 0.5; color: #fff; }
-.stat-box .val { color: var(--gold); font-weight: 900; font-size: 14px; }
+.stat-box label { font-size: 13px; font-weight: 900; color: #aaa; }
+.stat-box .val { color: var(--gold); font-weight: 900; font-size: 22px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
 
 .config-textarea { 
     width: 100%; 
-    height: 80px; 
-    background: rgba(0,0,0,0.4); 
-    border: 1px solid rgba(255,255,255,0.1); 
-    border-radius: 8px; 
-    padding: 12px; 
-    color: #ccc; 
-    font-size: 13px; 
+    height: 120px; 
+    background: rgba(0,0,0,0.6); 
+    border: 1px solid rgba(0, 210, 255, 0.3); 
+    padding: 16px; 
+    color: #fff; 
+    font-size: 16px; 
     font-family: inherit; 
     resize: none;
     outline: none;
 }
-.config-textarea:focus { border-color: var(--gold); }
 
 button { 
     width: 100%; 
-    padding: 15px; 
-    border-radius: 12px; 
-    border: none; 
-    font-weight: 900; 
-    cursor: pointer; 
+    padding: 22px; 
     background: var(--gold); 
     color: #000;
-    font-size: 14px;
+    font-size: 20px;
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: transform 0.2s, opacity 0.2s;
+    border: none;
+    cursor: pointer;
+    clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%); /* 함선 장갑판 느낌 */
+    transition: 0.3s;
 }
-button:active { transform: scale(0.98); }
-button:hover { opacity: 0.9; }
+button:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4); }
 
-.divider { height: 1px; background: rgba(255,255,255,0.05); margin: 25px 0; }
-
-/* Admin View Styles */
-.card { border-left: 4px solid var(--gold); }
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.card-name { font-size: 18px; font-weight: 900; color: #fff; }
-.card-followers { font-size: 12px; color: var(--gold); }
-.card-skill { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
-.skill-label { font-size: 10px; font-weight: 900; color: var(--gold); margin-bottom: 5px; display: block; }
-.skill-text { font-size: 13px; color: #bbb; line-height: 1.5; }
-
-.view-toggle {
-    margin-bottom: 30px;
-    display: flex;
-    gap: 10px;
-}
+.view-toggle { margin-bottom: 40px; display: flex; gap: 15px; }
 .view-toggle button {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.05);
     color: #fff;
-    padding: 10px 20px;
-    width: auto;
+    padding: 12px 25px;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    clip-path: none;
 }
-.view-toggle button.active {
-    background: var(--gold);
-    color: #000;
-}
+.view-toggle button.active { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); }
+
+.divider { height: 2px; background: repeating-linear-gradient(90deg, var(--gold), var(--gold) 10px, transparent 10px, transparent 20px); opacity: 0.2; margin: 35px 0; }
