@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOLLOWER BATTLE STATS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="view-toggle">
+            <button id="submit-mode-btn" class="active" onclick="setView('submit')">SUBMIT STATS</button>
+            <button id="admin-mode-btn" onclick="setView('admin')">ADMIN VIEW</button>
+        </div>
+
+        <!-- Submission Form Section -->
+        <section id="submit-view">
+            <div id="settings-panel">
+                <div class="panel-label">CHARACTER REGISTRATION</div>
+                <div class="config-group">
+                    <h3 class="config-title">USER INFO</h3>
+                    <input type="text" id="name-input" class="config-input" placeholder="Display Name" required>
+                    <input type="number" id="follower-input" class="config-input" placeholder="Follower Count" required oninput="calculateStats()">
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="config-group">
+                    <h3 class="config-title">CALCULATED STATS</h3>
+                    <div class="stat-grid">
+                        <div class="stat-box"><label>HP</label><span id="hp-val" class="val">100</span></div>
+                        <div class="stat-box"><label>ATK</label><span id="atk-val" class="val">5</span></div>
+                        <div class="stat-box"><label>SPD</label><span id="spd-val" class="val">5</span></div>
+                        <div class="stat-box"><label>SIZE</label><span id="size-val" class="val">25</span></div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="config-group">
+                    <h3 class="config-title">SKILL DESCRIPTION</h3>
+                    <textarea id="skill-desc" class="config-textarea" placeholder="Describe your unique battle skill..."></textarea>
+                </div>
+
+                <button onclick="submitForm()">SUBMIT CHARACTER</button>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard Section -->
+        <section id="admin-view" style="display: none;">
+            <div class="panel-label">SUBMITTED CHARACTERS</div>
+            <div id="submissions-list">
+                <!-- Cards will be injected here -->
+                <div class="card" style="text-align: center; opacity: 0.5;">Loading submissions...</div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

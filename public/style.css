@@ -1,0 +1,142 @@
+:root {
+    --p1-color: #ff4757;
+    --p2-color: #00d2ff;
+    --gold: #ffd700;
+    --bg-dark: #0a0b10;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-dark);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    z-index: 1;
+}
+
+#side-controls, #settings-panel, .card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.panel-label { 
+    font-size: 12px; 
+    font-weight: 900; 
+    color: var(--gold); 
+    text-align: center; 
+    letter-spacing: 3px; 
+    margin-bottom: 25px; 
+    text-transform: uppercase;
+}
+
+.config-group { margin-bottom: 20px; }
+.config-title { font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-transform: uppercase; }
+
+.config-input { 
+    width: 100%; 
+    background: rgba(0,0,0,0.4); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 8px; 
+    padding: 12px; 
+    color: #fff; 
+    font-weight: 700; 
+    margin-bottom: 12px; 
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+.config-input:focus { border-color: var(--gold); }
+
+.stat-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 10px; 
+    margin-bottom: 15px; 
+}
+
+.stat-box { 
+    background: rgba(0,0,0,0.2); 
+    padding: 10px; 
+    border-radius: 8px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+.stat-box label { font-size: 10px; font-weight: 900; opacity: 0.5; color: #fff; }
+.stat-box .val { color: var(--gold); font-weight: 900; font-size: 14px; }
+
+.config-textarea { 
+    width: 100%; 
+    height: 80px; 
+    background: rgba(0,0,0,0.4); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 8px; 
+    padding: 12px; 
+    color: #ccc; 
+    font-size: 13px; 
+    font-family: inherit; 
+    resize: none;
+    outline: none;
+}
+.config-textarea:focus { border-color: var(--gold); }
+
+button { 
+    width: 100%; 
+    padding: 15px; 
+    border-radius: 12px; 
+    border: none; 
+    font-weight: 900; 
+    cursor: pointer; 
+    background: var(--gold); 
+    color: #000;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s, opacity 0.2s;
+}
+button:active { transform: scale(0.98); }
+button:hover { opacity: 0.9; }
+
+.divider { height: 1px; background: rgba(255,255,255,0.05); margin: 25px 0; }
+
+/* Admin View Styles */
+.card { border-left: 4px solid var(--gold); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.card-name { font-size: 18px; font-weight: 900; color: #fff; }
+.card-followers { font-size: 12px; color: var(--gold); }
+.card-skill { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
+.skill-label { font-size: 10px; font-weight: 900; color: var(--gold); margin-bottom: 5px; display: block; }
+.skill-text { font-size: 13px; color: #bbb; line-height: 1.5; }
+
+.view-toggle {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 10px;
+}
+.view-toggle button {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 10px 20px;
+    width: auto;
+}
+.view-toggle button.active {
+    background: var(--gold);
+    color: #000;
+}
