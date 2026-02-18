@@ -16,33 +16,25 @@ const STAT_COSTS = {
     size: 10
 };
 
-let baseBudget = 1000;
+let baseBudget = 0; // 기본 스탯 1000 제거 -> 0으로 설정
 let followerBonus = 0;
-let totalBudget = 1000;
-let remainingPoints = 1000;
+let totalBudget = 0;
+let remainingPoints = 0;
 
-// 1. ball_tournament 팔로워 정보를 가져오는 실시간 API 연동 (Mock API for Demo)
-// 실제 인스타그램은 브라우저에서 직접 스크래핑이 불가능하므로, 
-// 공용 API 또는 프록시 서버를 통해 정보를 가져오는 형태를 시뮬레이션합니다.
+// 1. Cloudflare Functions를 통해 실시간 팔로워 데이터 가져오기
 async function syncFollowerData() {
     const coreStatus = document.getElementById('core-status');
     const TARGET_ID = 'ball_tournament';
     
     try {
-        // 인스타그램은 CORS 이슈로 직접 Fetch가 어렵습니다.
-        // 여기서는 실시간 정보를 제공하는 가상의 API 또는 공개 통계 서비스를 호출하는 로직을 작성합니다.
-        // 현재는 실제 수치가 있다고 가정하거나, 데이터가 없을 경우 기본값을 사용하는 로직입니다.
+        // 백엔드 함수 (/api/followers) 호출
+        const response = await fetch('/api/followers');
+        const data = await response.json();
         
-        // 시나리오: API 호출 시뮬레이션 (실제 구현 시 본인의 백엔드 또는 API 키가 있는 프록시 사용 권장)
-        // const response = await fetch(`https://social-api-proxy.com/instagram/${TARGET_ID}`);
-        // const data = await response.json();
-        // followerBonus = data.followers_count;
-
-        // 데모용: 실제 작동 시뮬레이션 (API가 없으면 기본 보너스를 500으로 설정)
-        // 실제 운영 시에는 이 부분을 본인의 서버 API 주소로 바꾸시면 됩니다.
-        followerBonus = 2300; // 예시: 현재 ball_tournament 계정의 팔로워 보너스 수치
+        // 실제 인스타그램 팔로워 수 반영
+        followerBonus = data.followers || 0; 
         
-        coreStatus.innerText = `● SYNCED: ${followerBonus.toLocaleString()} 에너지 충전됨`;
+        coreStatus.innerText = `● SYNCED: ${followerBonus.toLocaleString()} 에너지 충전됨 (@${TARGET_ID})`;
         coreStatus.style.color = "var(--neon-blue)";
         
         totalBudget = baseBudget + followerBonus;
@@ -52,8 +44,7 @@ async function syncFollowerData() {
         coreStatus.innerText = "● OFFLINE: 데이터 동기화 실패";
         coreStatus.style.color = "#ff4757";
         
-        // 실패 시 기본값이라도 사용
-        totalBudget = baseBudget;
+        totalBudget = 0;
         initBudget();
     }
 }
@@ -76,7 +67,7 @@ function changeStat(statName, delta) {
     const totalCost = delta * costPerUnit;
 
     if (delta > 0 && remainingPoints < totalCost) {
-        alert("에너지가 부족합니다! ball_tournament 계정이 더 커져야 합니다.");
+        alert("에너지가 부족합니다! ball_tournament 팔로워 수만큼만 스탯을 찍을 수 있습니다.");
         return;
     }
 
