@@ -1,49 +1,46 @@
 export async function onRequest(context) {
   const targetId = 'ball_tournament';
-  const url = `https://www.instagram.com/${targetId}/`;
+  const apiKey = 'f21ae81673msh35de0fed8957665p159f67jsn7d6978fee6d3'; // 제공해주신 API 키
+  const apiHost = 'instagram-data1.p.rapidapi.com';
+  
+  const url = `https://${apiHost}/user/info?username=${targetId}`;
 
   try {
-    // 1. 인스타그램 프로필 페이지 Fetch (서버 사이드 요청)
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9',
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': apiHost,
       }
     });
 
-    if (!response.ok) throw new Error('인스타그램 접근 실패');
+    if (!response.ok) {
+      throw new Error(`API 호출 실패: ${response.status}`);
+    }
 
-    const html = await response.text();
+    const data = await response.json();
     
-    // 2. 메타 태그에서 팔로워 수 추출 (정규식 사용)
-    // 인스타그램은 "<meta content="1,234 Followers..." 형태의 태그를 가집니다.
-    const followerMatch = html.match(/"edge_followed_by":{"count":(\d+)}/);
+    // API 응답 구조에 맞춰 팔로워 수 추출
+    // 보통 instagram-data1 API는 data.follower_count 또는 data.edge_followed_by.count 형식을 사용합니다.
     let followers = 0;
-
-    if (followerMatch) {
-      followers = parseInt(followerMatch[1]);
-    } else {
-      // 대체 패턴 (비로그인 상태 메타 태그)
-      const metaMatch = html.match(/content="([\d,.]+[KMB]?) Followers/);
-      if (metaMatch) {
-        followers = parseFollowers(metaMatch[1]);
-      }
+    if (data.follower_count !== undefined) {
+      followers = data.follower_count;
+    } else if (data.edge_followed_by && data.edge_followed_by.count !== undefined) {
+      followers = data.edge_followed_by.count;
+    } else if (data.followers !== undefined) {
+      followers = data.followers;
     }
 
     return new Response(JSON.stringify({ followers }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache' // 실시간성 유지
+      }
     });
   } catch (error) {
+    console.error("RapidAPI Error:", error);
     return new Response(JSON.stringify({ followers: 0, error: error.message }), {
       headers: { 'Content-Type': 'application/json' }
     });
   }
-}
-
-// 1.2K 등을 숫자로 변환하는 유틸리티
-function parseFollowers(str) {
-  str = str.replace(/,/g, '');
-  if (str.endsWith('K')) return parseFloat(str) * 1000;
-  if (str.endsWith('M')) return parseFloat(str) * 1000000;
-  return parseInt(str);
 }
