@@ -3,47 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FOLLOWER BATTLE STATS</title>
+    <title>팔로워 배틀 스탯 등록</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <div class="view-toggle">
-            <button id="submit-mode-btn" class="active" onclick="setView('submit')">SUBMIT STATS</button>
-            <button id="admin-mode-btn" onclick="setView('admin')">ADMIN VIEW</button>
+            <button id="submit-mode-btn" class="active" onclick="setView('submit')">스탯 등록하기</button>
+            <button id="admin-mode-btn" onclick="setView('admin')">관리자 보기</button>
         </div>
 
         <!-- Submission Form Section -->
         <section id="submit-view">
             <div id="settings-panel">
-                <div class="panel-label">CHARACTER REGISTRATION</div>
+                <div class="panel-label">캐릭터 등록 시스템</div>
                 <div class="config-group">
-                    <h3 class="config-title">USER INFO</h3>
-                    <input type="text" id="name-input" class="config-input" placeholder="Display Name" required>
-                    <input type="number" id="follower-input" class="config-input" placeholder="Follower Count" required oninput="calculateStats()">
+                    <h3 class="config-title">유저 정보</h3>
+                    <input type="text" id="name-input" class="config-input" placeholder="활동명 (닉네임)" required>
+                    <input type="text" id="insta-input" class="config-input" placeholder="인스타그램 계정 (@ID)" required>
+                    <input type="number" id="follower-input" class="config-input" placeholder="팔로워 수" required oninput="calculateStats()">
                 </div>
 
                 <div class="divider"></div>
 
                 <div class="config-group">
-                    <h3 class="config-title">CALCULATED STATS</h3>
+                    <h3 class="config-title">계산된 능력치</h3>
                     <div class="stat-grid">
-                        <div class="stat-box"><label>HP</label><span id="hp-val" class="val">100</span></div>
-                        <div class="stat-box"><label>ATK</label><span id="atk-val" class="val">5</span></div>
-                        <div class="stat-box"><label>SPD</label><span id="spd-val" class="val">5</span></div>
-                        <div class="stat-box"><label>SIZE</label><span id="size-val" class="val">25</span></div>
+                        <div class="stat-box"><label>체력(HP)</label><span id="hp-val" class="val">100</span></div>
+                        <div class="stat-box"><label>공격력(ATK)</label><span id="atk-val" class="val">5</span></div>
+                        <div class="stat-box"><label>속도(SPD)</label><span id="spd-val" class="val">5</span></div>
+                        <div class="stat-box"><label>크기(SIZE)</label><span id="size-val" class="val">25</span></div>
                     </div>
                 </div>
 
                 <div class="divider"></div>
 
                 <div class="config-group">
-                    <h3 class="config-title">SKILL DESCRIPTION</h3>
-                    <textarea id="skill-desc" class="config-textarea" placeholder="Describe your unique battle skill..."></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 class="config-title" style="margin-bottom: 0;">스킬 설명</h3>
+                        <span style="font-size: 9px; color: var(--gold); opacity: 0.8;">(상상하신 스킬(딜 구조)을 정확하게 묘사해주세요!)</span>
+                    </div>
+                    <textarea id="skill-desc" class="config-textarea" placeholder="당신만의 고유한 배틀 스킬을 설명해 주세요..."></textarea>
                 </div>
 
-                <button onclick="submitForm()">SUBMIT CHARACTER</button>
+                <button onclick="submitForm()">캐릭터 등록하기</button>
             </div>
         </section>
 
