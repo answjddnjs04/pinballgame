@@ -23,18 +23,52 @@
                     <h3 class="config-title">유저 정보</h3>
                     <input type="text" id="name-input" class="config-input" placeholder="활동명 (닉네임)" required>
                     <input type="text" id="insta-input" class="config-input" placeholder="인스타그램 계정 (@ID)" required>
-                    <input type="number" id="follower-input" class="config-input" placeholder="팔로워 수" required oninput="calculateStats()">
+                    <input type="number" id="follower-input" class="config-input" placeholder="팔로워 수" required oninput="initBudget()">
                 </div>
 
                 <div class="divider"></div>
 
                 <div class="config-group">
-                    <h3 class="config-title">계산된 능력치</h3>
+                    <h3 class="config-title">스탯 배정</h3>
+                    
+                    <div class="budget-display">
+                        <div class="budget-label">사용 가능한 스탯 포인트</div>
+                        <div id="budget-val" class="budget-val">1000</div>
+                    </div>
+
                     <div class="stat-grid">
-                        <div class="stat-box"><label>체력 (HP)</label><span id="hp-val" class="val">100</span></div>
-                        <div class="stat-box"><label>공격력 (ATK)</label><span id="atk-val" class="val">5</span></div>
-                        <div class="stat-box"><label>속도 (SPD)</label><span id="spd-val" class="val">5</span></div>
-                        <div class="stat-box"><label>크기 (SIZE)</label><span id="size-val" class="val">25</span></div>
+                        <div class="stat-box">
+                            <label>체력 (HP) <small style="display:block; font-size:10px; opacity:0.6;">1 포인트당 1 상승</small></label>
+                            <div class="stat-controls">
+                                <button class="stat-btn" onclick="changeStat('hp', -10)">-</button>
+                                <span id="hp-val" class="val">100</span>
+                                <button class="stat-btn" onclick="changeStat('hp', 10)">+</button>
+                            </div>
+                        </div>
+                        <div class="stat-box">
+                            <label>공격력 (ATK) <small style="display:block; font-size:10px; opacity:0.6;">20 포인트당 1 상승</small></label>
+                            <div class="stat-controls">
+                                <button class="stat-btn" onclick="changeStat('atk', -1)">-</button>
+                                <span id="atk-val" class="val">5</span>
+                                <button class="stat-btn" onclick="changeStat('atk', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="stat-box">
+                            <label>속도 (SPD) <small style="display:block; font-size:10px; opacity:0.6;">50 포인트당 1 상승</small></label>
+                            <div class="stat-controls">
+                                <button class="stat-btn" onclick="changeStat('spd', -1)">-</button>
+                                <span id="spd-val" class="val">5</span>
+                                <button class="stat-btn" onclick="changeStat('spd', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="stat-box">
+                            <label>크기 (SIZE) <small style="display:block; font-size:10px; opacity:0.6;">10 포인트당 1 상승</small></label>
+                            <div class="stat-controls">
+                                <button class="stat-btn" onclick="changeStat('size', -1)">-</button>
+                                <span id="size-val" class="val">25</span>
+                                <button class="stat-btn" onclick="changeStat('size', 1)">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

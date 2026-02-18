@@ -30,7 +30,6 @@ body {
     overflow-x: hidden;
 }
 
-/* 스캔라인 효과 */
 body::before {
     content: " ";
     position: fixed;
@@ -100,20 +99,45 @@ body::before {
 
 .stat-grid { 
     display: grid; 
-    grid-template-columns: 1fr 1fr; 
+    grid-template-columns: 1fr; 
     gap: 15px; 
 }
 
 .stat-box { 
     background: rgba(255, 255, 255, 0.03); 
-    padding: 15px; 
+    padding: 15px 20px; 
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex; 
     justify-content: space-between; 
     align-items: center;
 }
-.stat-box label { font-size: 14px; font-weight: 900; color: #aaa; }
-.stat-box .val { color: var(--gold); font-weight: 900; font-size: 24px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+.stat-box label { font-size: 15px; font-weight: 900; color: #aaa; flex: 1; }
+.stat-controls { display: flex; align-items: center; gap: 15px; }
+.stat-btn {
+    width: 35px; height: 35px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+    font-weight: 900;
+    cursor: pointer;
+    display: flex; justify-content: center; align-items: center;
+    transition: 0.2s;
+}
+.stat-btn:hover { background: var(--neon-blue); color: #000; }
+.stat-btn:active { transform: scale(0.9); }
+.stat-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+.stat-box .val { color: var(--gold); font-weight: 900; font-size: 24px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); width: 60px; text-align: center; }
+
+.budget-display {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid var(--gold);
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+.budget-label { font-size: 14px; color: var(--gold); font-weight: 900; margin-bottom: 5px; }
+.budget-val { font-size: 32px; font-weight: 900; color: #fff; }
 
 .config-textarea { 
     width: 100%; 
@@ -128,7 +152,7 @@ body::before {
     outline: none;
 }
 
-button { 
+button[onclick="submitForm()"] { 
     width: 100%; 
     padding: 22px; 
     background: var(--gold); 
@@ -140,7 +164,7 @@ button {
     clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
     transition: 0.3s;
 }
-button:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4); }
+button[onclick="submitForm()"]:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4); }
 
 .view-toggle { margin-bottom: 40px; display: flex; gap: 15px; }
 .view-toggle button {
@@ -150,6 +174,7 @@ button:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 
     font-size: 16px;
     border: 1px solid rgba(255,255,255,0.1);
     clip-path: none;
+    width: auto;
 }
 .view-toggle button.active { background: var(--neon-blue); color: #000; border-color: var(--neon-blue); }
 
