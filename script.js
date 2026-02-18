@@ -3,7 +3,7 @@ let stats = {
     hp: 100,
     atk: 5,
     spd: 5,
-    size: 25
+    size: 20 // 25에서 20으로 수정 (MIN_STATS와 동일하게)
 };
 
 const MIN_STATS = { hp: 100, atk: 5, spd: 5, size: 20 };
