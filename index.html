@@ -9,6 +9,12 @@
 </head>
 <body>
     <div class="container">
+        <!-- 상단 에너지 코어 상태 (실시간 팔로워 연동) -->
+        <div id="energy-core" class="budget-display" style="border-color: var(--neon-blue); background: rgba(0, 210, 255, 0.05); margin-bottom: 20px;">
+            <div class="budget-label" style="color: var(--neon-blue);">전투 에너지 코어 동기화 (ball_tournament)</div>
+            <div id="core-status" class="budget-val" style="font-size: 24px; color: #fff;">데이터 동기화 중...</div>
+        </div>
+
         <div class="view-toggle">
             <button id="submit-mode-btn" class="active" onclick="setView('submit')">스탯 등록하기</button>
             <button id="admin-mode-btn" onclick="setView('admin')">관리자 보기</button>
@@ -23,7 +29,7 @@
                     <h3 class="config-title">유저 정보</h3>
                     <input type="text" id="name-input" class="config-input" placeholder="활동명 (닉네임)" required>
                     <input type="text" id="insta-input" class="config-input" placeholder="인스타그램 계정 (@ID)" required>
-                    <input type="number" id="follower-input" class="config-input" placeholder="팔로워 수" required oninput="initBudget()">
+                    <!-- 팔로워 입력란 삭제됨 -->
                 </div>
 
                 <div class="divider"></div>
