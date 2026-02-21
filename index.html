@@ -17,11 +17,13 @@
 
         <div class="view-toggle">
             <button id="submit-mode-btn" class="active" onclick="setView('submit')">스탯 등록하기</button>
+            <button id="gallery-mode-btn" onclick="setView('gallery')">캐릭터 갤러리</button>
             <button id="admin-mode-btn" onclick="setView('admin')">관리자 보기</button>
         </div>
 
         <!-- Submission Form Section -->
         <section id="submit-view">
+            <!-- 기존 폼 내용 ... -->
             <div id="settings-panel">
                 <div class="panel-label">캐릭터 등록 시스템</div>
                 
@@ -115,6 +117,17 @@
                 </div>
 
                 <button onclick="submitForm()">캐릭터 등록하기</button>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery-view" style="display: none;">
+            <div class="gallery-controls">
+                <button class="sort-btn active" onclick="sortGallery('latest')">최신순</button>
+                <button class="sort-btn" onclick="sortGallery('likes')">좋아요순</button>
+            </div>
+            <div id="gallery-list" class="gallery-grid">
+                <!-- 캐릭터 카드들이 여기에 렌더링됩니다 -->
             </div>
         </section>
 

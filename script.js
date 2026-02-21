@@ -1,13 +1,5 @@
 // Character Stats State (Points invested)
-let points = {
-    hp: 0,
-    atk: 0,
-    speed: 0,
-    size: 0,
-    cooldown: 0
-};
-
-// Base Values
+let points = { hp: 0, atk: 0, speed: 0, size: 0, cooldown: 0 };
 const BASE_STATS = { hp: 100, atk: 10, speed: 5, size: 30 };
 const MIN_STATS = { hp: 100, atk: 10, speed: 0, size: 10 };
 const MAX_STATS = { speed: 30, size_larger: 100, size_smaller: 10 };
@@ -15,6 +7,25 @@ const MAX_STATS = { speed: 30, size_larger: 100, size_smaller: 10 };
 let followerCount = 0;
 let totalBudget = 0;
 let remainingPoints = 0;
+let currentSort = 'latest';
+
+// [DB 시뮬레이션] 데이터 저장 및 불러오기 (Local Storage)
+function getSubmissions() {
+    const saved = localStorage.getItem('bt_submissions');
+    return saved ? JSON.parse(saved) : [];
+}
+
+function saveSubmission(data) {
+    const subs = getSubmissions();
+    subs.push({
+        ...data,
+        id: Date.now(),
+        likes: 0,
+        comments: [],
+        timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('bt_submissions', JSON.stringify(subs));
+}
 
 // 1. Sync Follower Data
 async function syncFollowerData() {
@@ -22,24 +33,18 @@ async function syncFollowerData() {
     try {
         const response = await fetch('/api/followers');
         const data = await response.json();
-        
-        // 1팔로워당 10포인트
         followerCount = data.followers || 0;
         totalBudget = followerCount * 10; 
-        
         coreStatus.innerText = `● SYNCED: ${followerCount.toLocaleString()} 에너지 충전됨 (@ball_tournament)`;
         coreStatus.style.color = "var(--neon-blue)";
-        
         initBudget();
     } catch (err) {
         coreStatus.innerText = "● OFFLINE: 데이터 동기화 실패";
         coreStatus.style.color = "#ff4757";
-        totalBudget = 0;
-        initBudget();
+        totalBudget = 0; initBudget();
     }
 }
 
-// 2. Budget 관리
 function initBudget() {
     const spent = Object.values(points).reduce((a, b) => a + b, 0);
     remainingPoints = totalBudget - spent;
@@ -47,8 +52,6 @@ function initBudget() {
 }
 
 function changeStat(statName, delta) {
-    // 30% Limit for Speed and Size
-    // 팔로워가 있어 에너지가 생성되었을 때만 제한 적용
     if (totalBudget > 0 && (statName === 'speed' || statName === 'size')) {
         const limit = totalBudget * 0.3;
         if (delta > 0 && (points[statName] + delta) > limit) {
@@ -56,147 +59,154 @@ function changeStat(statName, delta) {
             return;
         }
     }
-
-    // Cost Check
-    if (delta > 0 && remainingPoints < delta) {
-        alert("에너지가 부족합니다!");
-        return;
-    }
-
-    // Min Check (투자 포인트는 0 미만 불가)
-    if (delta < 0 && points[statName] + delta < 0) {
-        return;
-    }
-
+    if (delta > 0 && remainingPoints < delta) { alert("에너지가 부족합니다!"); return; }
+    if (delta < 0 && points[statName] + delta < 0) return;
     points[statName] += delta;
     initBudget();
 }
 
 function updateUI() {
-    // 1. Speed Calculation (0% -> 5, 30% -> 30)
     let speedVal = BASE_STATS.speed;
-    if (totalBudget > 0) {
-        const speedLimit = totalBudget * 0.3;
-        const speedRatio = points.speed / (speedLimit || 1);
-        speedVal = BASE_STATS.speed + (speedRatio * (MAX_STATS.speed - BASE_STATS.speed));
-    }
+    const speedLimit = totalBudget * 0.3;
+    if (totalBudget > 0) speedVal = BASE_STATS.speed + ((points.speed / (speedLimit || 1)) * (MAX_STATS.speed - BASE_STATS.speed));
     document.getElementById('speed-display').innerText = Math.min(30, speedVal.toFixed(1));
 
-    // 2. Size Calculation (0% -> 30, 30% -> 10 or 100)
     let sizeVal = BASE_STATS.size;
     const sizeDir = document.querySelector('input[name="size-dir"]:checked').value;
+    const sizeLimit = totalBudget * 0.3;
     if (totalBudget > 0) {
-        const sizeLimit = totalBudget * 0.3;
         const sizeRatio = points.size / (sizeLimit || 1);
-        if (sizeDir === 'smaller') {
-            sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
-        } else {
-            sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
-        }
+        if (sizeDir === 'smaller') sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
+        else sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
     }
     document.getElementById('size-display').innerText = Math.round(sizeVal);
-
-    // 3. HP/ATK Basic
-    // HP: 1포인트당 1 HP
     document.getElementById('hp-val').innerText = BASE_STATS.hp + points.hp;
-    // ATK: 1포인트당 0.1 ATK
     document.getElementById('atk-val').innerText = (BASE_STATS.atk + (points.atk * 0.1)).toFixed(1);
-
-    // 4. Cooldown (Show points)
     document.getElementById('cooldown-points').innerText = points.cooldown + "P";
-
-    // 5. Budget Display
     const budgetEl = document.getElementById('budget-val');
     budgetEl.innerText = remainingPoints.toLocaleString();
-    budgetEl.style.color = remainingPoints < 0 ? "#ff4757" : "#fff";
 }
 
-// 3. View Management (동일)
 function setView(mode) {
-    const submitView = document.getElementById('submit-view');
-    const adminView = document.getElementById('admin-view');
-    const submitBtn = document.getElementById('submit-mode-btn');
-    const adminBtn = document.getElementById('admin-mode-btn');
+    const views = ['submit-view', 'gallery-view', 'admin-view'];
+    views.forEach(v => document.getElementById(v).style.display = v.startsWith(mode) ? 'block' : 'none');
+    
+    document.querySelectorAll('.view-toggle button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`${mode}-mode-btn`).classList.add('active');
+    
+    if (mode === 'gallery') renderGallery();
+    if (mode === 'admin') renderAdminMessage();
+}
 
-    if (mode === 'submit') {
-        submitView.style.display = 'block';
-        adminView.style.display = 'none';
-        submitBtn.classList.add('active');
-        adminBtn.classList.remove('active');
-    } else {
-        submitView.style.display = 'none';
-        adminView.style.display = 'block';
-        submitBtn.classList.remove('active');
-        adminBtn.classList.add('active');
-        renderAdminMessage();
+// [갤러리 렌더링]
+function renderGallery() {
+    const list = document.getElementById('gallery-list');
+    let subs = getSubmissions();
+    
+    // 정렬
+    if (currentSort === 'latest') subs.sort((a, b) => b.id - a.id);
+    else subs.sort((a, b) => b.likes - a.likes);
+
+    list.innerHTML = subs.map(sub => `
+        <div class="card" style="border-left-color: ${sub.id % 2 ? 'var(--neon-blue)' : 'var(--gold)'}">
+            <div class="card-header">
+                <div>
+                    <div class="char-name">${sub.활동명}</div>
+                    <div class="char-insta">${sub.인스타그램ID}</div>
+                </div>
+                <div class="char-insta" style="text-align: right;">${new Date(sub.timestamp).toLocaleDateString()}</div>
+            </div>
+            
+            <div class="stat-row-display">
+                <span class="stat-tag">❤️ HP ${sub.최종_HP}</span>
+                <span class="stat-tag">⚔️ ATK ${sub.최종_ATK}</span>
+                <span class="stat-tag">⚡ SPD ${sub.최종_SPEED}</span>
+                <span class="stat-tag">📏 SIZE ${sub.최종_SIZE}</span>
+            </div>
+
+            <div class="skill-desc-box">${sub.스킬설명 || "설명이 없습니다."}</div>
+
+            <div class="interaction-bar">
+                <button class="like-btn" onclick="addLike(${sub.id})">🔥 LIKE ${sub.likes}</button>
+                <div class="comment-count">💬 댓글 ${sub.comments.length}개</div>
+            </div>
+
+            <div class="comment-section">
+                <div class="comment-list">
+                    ${sub.comments.map(c => `<div class="comment-item">● ${c}</div>`).join('')}
+                </div>
+                <div class="comment-input-row">
+                    <input type="text" id="cmt-${sub.id}" class="comment-input" placeholder="댓글을 입력하세요...">
+                    <button class="sort-btn" onclick="addComment(${sub.id})">등록</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function sortGallery(type) {
+    currentSort = type;
+    document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.includes(type === 'latest' ? '최신' : '좋아요')));
+    renderGallery();
+}
+
+function addLike(id) {
+    let subs = getSubmissions();
+    const target = subs.find(s => s.id === id);
+    if (target) {
+        target.likes++;
+        localStorage.setItem('bt_submissions', JSON.stringify(subs));
+        renderGallery();
     }
 }
 
-// 4. Form Submission (최종 계산 반영)
+function addComment(id) {
+    const input = document.getElementById(`cmt-${id}`);
+    if (!input.value.trim()) return;
+    
+    let subs = getSubmissions();
+    const target = subs.find(s => s.id === id);
+    if (target) {
+        target.comments.push(input.value.trim());
+        localStorage.setItem('bt_submissions', JSON.stringify(subs));
+        renderGallery();
+    }
+}
+
 async function submitForm() {
     const name = document.getElementById('name-input').value;
     const instaId = document.getElementById('insta-input').value;
     const skillDesc = document.getElementById('skill-desc').value;
-    const sizeDir = document.querySelector('input[name="size-dir"]:checked').value;
-    
-    if (!name || !instaId) {
-        alert("이름과 인스타 계정을 입력해 주세요.");
-        return;
-    }
+    if (!name || !instaId) { alert("이름과 인스타 계정을 입력해 주세요."); return; }
 
-    // 최종 수치 계산
     const speedLimit = totalBudget * 0.3;
-    const speedVal = (BASE_STATS.speed + ((points.speed / (speedLimit || 1)) * (MAX_STATS.speed - BASE_STATS.speed))).toFixed(2);
+    const speedVal = (BASE_STATS.speed + ((points.speed / (speedLimit || 1)) * (MAX_STATS.speed - BASE_STATS.speed))).toFixed(1);
     
     const sizeLimit = totalBudget * 0.3;
     let sizeVal = BASE_STATS.size;
     const sizeRatio = points.size / (sizeLimit || 1);
-    if (sizeDir === 'smaller') {
+    if (document.querySelector('input[name="size-dir"]:checked').value === 'smaller') {
         sizeVal = BASE_STATS.size - (sizeRatio * (BASE_STATS.size - MAX_STATS.size_smaller));
     } else {
         sizeVal = BASE_STATS.size + (sizeRatio * (MAX_STATS.size_larger - BASE_STATS.size));
     }
 
-    const formData = new FormData();
-    formData.append("활동명", name);
-    formData.append("인스타그램ID", instaId);
-    formData.append("대회계정_팔로워수", followerCount);
-    formData.append("최종_HP", BASE_STATS.hp + points.hp);
-    formData.append("최종_ATK", (BASE_STATS.atk + (points.atk * 0.1)).toFixed(1));
-    formData.append("최종_SPEED", speedVal);
-    formData.append("최종_SIZE", Math.round(sizeVal));
-    formData.append("SIZE_방향", sizeDir);
-    formData.append("쿨타임_투자포인트", points.cooldown);
-    formData.append("스킬설명", skillDesc);
+    const data = {
+        활동명: name, 인스타그램ID: instaId,
+        최종_HP: BASE_STATS.hp + points.hp,
+        최종_ATK: (BASE_STATS.atk + (points.atk * 0.1)).toFixed(1),
+        최종_SPEED: speedVal, 최종_SIZE: Math.round(sizeVal),
+        스킬설명: skillDesc
+    };
 
-    try {
-        const response = await fetch('https://formspree.io/f/mwvnqprn', {
-            method: 'POST',
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-        });
-
-        if (response.ok) {
-            alert("기체 등록 완료! 감사합니다.");
-            location.reload();
-        } else {
-            alert("등록 실패.");
-        }
-    } catch (err) {
-        alert("서버 오류.");
-    }
+    saveSubmission(data);
+    alert("캐릭터 등록 및 갤러리 게시 완료!");
+    setView('gallery');
 }
 
 function renderAdminMessage() {
     const list = document.getElementById('submissions-list');
-    list.innerHTML = `
-        <div class="card" style="text-align: center; border-left-color: var(--gold);">
-            <div class="panel-label">COMMAND CENTER</div>
-            <p class="skill-text">제출된 모든 데이터는 Formspree에서 확인하세요.</p>
-            <br>
-            <button onclick="window.open('https://formspree.io/forms/mwvnqprn/submissions', '_blank')">데이터 확인하기</button>
-        </div>
-    `;
+    list.innerHTML = `<div class="card" style="text-align:center;"><p>관리 데이터는 Formspree 및 로컬 저장소에서 관리됩니다.</p></div>`;
 }
 
 syncFollowerData();
