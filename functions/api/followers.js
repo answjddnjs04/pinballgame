@@ -3,7 +3,7 @@ export async function onRequest(context) {
   // [수동 업데이트 설정] 
   // 팔로워 수를 직접 수정하려면 아래 숫자를 바꾸세요 (예: 500)
   // 0으로 두면 실시간 API 연동을 시도합니다.
-  const MANUAL_COUNT = 3; 
+  const MANUAL_COUNT = 4; 
   // ---------------------------------------------------------
 
   if (MANUAL_COUNT > 0) {
