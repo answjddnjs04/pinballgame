@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>팔로워 배틀 스탯 등록</title>
+    <title>팔로워 배틀 캐릭터 신청 센터</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -16,58 +16,38 @@
         </div>
 
         <div class="view-toggle">
-            <button id="submit-mode-btn" class="active" onclick="setView('submit')">스탯 등록하기</button>
-            <button id="gallery-mode-btn" onclick="setView('gallery')">캐릭터 갤러리</button>
-            <button id="admin-mode-btn" onclick="setView('admin')">관리자 보기</button>
+            <button id="submit-mode-btn" class="active" onclick="setView('submit')">캐릭터 신청</button>
+            <button id="gallery-mode-btn" onclick="setView('gallery')">신청 갤러리</button>
+            <button id="admin-mode-btn" onclick="setView('admin')">관리자 모드</button>
         </div>
 
-        <!-- Submission Form Section -->
+        <!-- 1. 캐릭터 등록 섹션 -->
         <section id="submit-view">
-            <!-- 기존 폼 내용 ... -->
             <div id="settings-panel">
-                <div class="panel-label">캐릭터 등록 시스템</div>
-                
+                <div class="panel-label">신규 전투 기체 제작 신청</div>
                 <div class="config-group">
-                    <h3 class="config-title">유저 정보</h3>
+                    <h3 class="config-title">USER INFO</h3>
                     <input type="text" id="name-input" class="config-input" placeholder="활동명 (닉네임)" required>
-                    <input type="text" id="insta-input" class="config-input" placeholder="인스타그램 계정 (@ID)" required>
+                    <input type="text" id="insta-input" class="config-input" placeholder="인스타그램 @ID" required>
                 </div>
-
                 <div class="divider"></div>
-
                 <div class="config-group">
-                    <h3 class="config-title">스탯 배정</h3>
-                    
                     <div class="budget-display">
-                        <div class="budget-label">사용 가능한 스탯 포인트</div>
+                        <div class="budget-label">사용 가능한 포인트</div>
                         <div id="budget-val" class="budget-val">0</div>
                     </div>
-
                     <div class="stat-grid">
-                        <!-- 쿨타임 (제한 없음) -->
                         <div class="stat-box">
-                            <label>쿨타임 (COOLDOWN) <small style="display:block; font-size:11px; color:var(--gold);">전체 포인트의 100% 투자 가능</small></label>
-                            <div class="stat-controls">
-                                <button class="stat-btn" onclick="changeStat('cooldown', -1)">-</button>
-                                <span id="cooldown-points" class="val">0P</span>
-                                <button class="stat-btn" onclick="changeStat('cooldown', 1)">+</button>
-                            </div>
-                        </div>
-
-                        <!-- 속도 (30% 제한) -->
-                        <div class="stat-box">
-                            <label>속도 (SPEED) <small style="display:block; font-size:11px; color:var(--neon-blue);">전체의 30% 투자 시 최대 속도(30) 도달</small></label>
+                            <label>속도 (SPEED)</label>
                             <div class="stat-controls">
                                 <button class="stat-btn" onclick="changeStat('speed', -1)">-</button>
                                 <span id="speed-display" class="val">5.0</span>
                                 <button class="stat-btn" onclick="changeStat('speed', 1)">+</button>
                             </div>
                         </div>
-
-                        <!-- 크기 (30% 제한) -->
                         <div class="stat-box" style="flex-direction: column; align-items: flex-start; gap: 10px;">
                             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                                <label>크기 (SIZE) <small style="display:block; font-size:11px; color:var(--neon-blue);">전체의 30% 투자 시 설정 크기 도달</small></label>
+                                <label>크기 (SIZE)</label>
                                 <div class="stat-controls">
                                     <button class="stat-btn" onclick="changeStat('size', -1)">-</button>
                                     <span id="size-display" class="val">30</span>
@@ -76,19 +56,15 @@
                             </div>
                             <div style="display: flex; gap: 20px; font-size: 13px; color: #fff; width: 100%; justify-content: flex-end;">
                                 <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                                    <input type="radio" name="size-dir" value="smaller" checked onchange="updateUI()"> 더 작게 (Min 10)
+                                    <input type="radio" name="size-dir" value="smaller" checked onchange="updateUI()"> Smaller
                                 </label>
                                 <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                                    <input type="radio" name="size-dir" value="larger" onchange="updateUI()"> 더 크게 (Max 100)
+                                    <input type="radio" name="size-dir" value="larger" onchange="updateUI()"> Larger
                                 </label>
                             </div>
                         </div>
-
-                        <div class="divider"></div>
-
-                        <!-- 기본 스탯 -->
                         <div class="stat-box">
-                            <label>체력 (HP) <small style="display:block; font-size:10px; opacity:0.6;">1 포인트당 1 상승</small></label>
+                            <label>체력 (HP)</label>
                             <div class="stat-controls">
                                 <button class="stat-btn" onclick="changeStat('hp', -1)">-</button>
                                 <span id="hp-val" class="val">100</span>
@@ -96,7 +72,7 @@
                             </div>
                         </div>
                         <div class="stat-box">
-                            <label>공격력 (ATK) <small style="display:block; font-size:10px; opacity:0.6;">1 포인트당 0.1 상승</small></label>
+                            <label>공격력 (ATK)</label>
                             <div class="stat-controls">
                                 <button class="stat-btn" onclick="changeStat('atk', -1)">-</button>
                                 <span id="atk-val" class="val">10.0</span>
@@ -105,35 +81,44 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="divider"></div>
-
                 <div class="config-group">
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
-                        <h3 class="config-title" style="margin-bottom: 0;">스킬 설명</h3>
-                        <span style="font-size: 13px; color: var(--gold); opacity: 0.9; font-weight: 700; letter-spacing: 0.5px;">(상상하신 스킬(딜 구조)을 정확하게 묘사해주세요!)</span>
-                    </div>
-                    <textarea id="skill-desc" class="config-textarea" placeholder="당신만의 고유한 배틀 스킬을 상세히 기록하세요..."></textarea>
+                    <textarea id="skill-desc" class="config-textarea" placeholder="상상하신 스킬 구동 방식을 상세히 기록하세요..."></textarea>
                 </div>
-
-                <button onclick="submitForm()">캐릭터 등록하기</button>
+                <button onclick="submitForm()" style="width: 100%; padding: 15px; background: var(--gold); color: #000; font-weight: 900; border-radius: 10px; border: none; font-size: 16px; cursor: pointer;">기체 제작 신청 완료</button>
             </div>
         </section>
 
-        <!-- Gallery Section -->
+        <!-- 2. 갤러리 섹션 (이원화) -->
         <section id="gallery-view" style="display: none;">
             <div class="gallery-controls">
                 <button class="sort-btn active" onclick="sortGallery('latest')">최신순</button>
                 <button class="sort-btn" onclick="sortGallery('likes')">좋아요순</button>
             </div>
-            <div id="gallery-list" class="gallery-grid">
-                <!-- 캐릭터 카드들이 여기에 렌더링됩니다 -->
-            </div>
+            
+            <h2 class="section-title">🏆 제작 완료된 챔피언</h2>
+            <div id="produced-list" class="gallery-grid"></div>
+
+            <div class="divider" style="margin: 40px 0;"></div>
+
+            <h2 class="section-title">💡 신규 제작 신청작</h2>
+            <div id="proposed-list" class="gallery-grid"></div>
         </section>
 
-        <!-- Admin Dashboard Section -->
+        <!-- 3. 관리자 섹션 -->
         <section id="admin-view" style="display: none;">
-            <div id="submissions-list"></div>
+            <!-- 관리자 로그인 창 -->
+            <div id="admin-login-box" class="card" style="text-align: center; border-left-color: var(--gold);">
+                <div class="panel-label">ADMIN ACCESS ONLY</div>
+                <p style="font-size: 11px; opacity: 0.7; margin-bottom: 15px;">제작 상태를 관리하려면 비밀번호를 입력하세요.</p>
+                <input type="password" id="admin-pw" class="config-input" placeholder="비밀번호 입력" style="text-align: center;">
+                <button onclick="checkAdminPw()" class="sort-btn" style="width: 100%; padding: 12px; margin-top: 10px;">로그인</button>
+            </div>
+            
+            <!-- 관리자 데이터 리스트 (로그인 시 노출) -->
+            <div id="admin-content" style="display: none;">
+                <div class="panel-label">COMMAD CENTER - 신청 관리</div>
+                <div id="admin-submission-list" class="gallery-grid"></div>
+            </div>
         </section>
     </div>
 
